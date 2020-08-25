@@ -8,20 +8,44 @@
 
     <TextView
         android:id="@+id/tvUUID"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <Button
-        android:id="@+id/btDisConnect"
-        android:text="断开配对"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btDisConnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="断开配对"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvUUID" />
 
+    <TextView
+        android:id="@+id/tvTip1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="配对一次后需要重新监听配对才能配对成功"
+        app:layout_constraintTop_toBottomOf="@id/btDisConnect" />
+
+    <Button
+        android:id="@+id/btReListener"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="重新监听配对"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTip1" />
+
+    <TextView
+        android:id="@+id/tvRead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:hint="这里显示接受的消息"
+        app:layout_constraintTop_toBottomOf="@id/btReListener" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

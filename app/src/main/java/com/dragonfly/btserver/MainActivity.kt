@@ -3,23 +3,50 @@ package com.dragonfly.btserver
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothServerSocket
-import android.bluetooth.BluetoothSocket
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ToastUtils
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.IOException
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = "BTServer"
-    val XXH_UUID = UUID.fromString("33719b35-639a-4edc-b9bc-345cf8bf3829")
-    val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-    private val thread = AcceptThread()
+    companion object {
+        const val TAG = "BTServer"
+        val XXH_UUID = UUID.fromString("33719b35-639a-4edc-b9bc-345cf8bf3829")
+        val mBTAdapter = BluetoothAdapter.getDefaultAdapter()
+
+        const val MESSAGE_READ: Int = 0
+        const val MESSAGE_WRITE: Int = 1
+        const val MESSAGE_TOAST: Int = 2
+    }
+
+    private var mConnectedThread: ConnectedThread? = null
+
+    private lateinit var mAcceptThread: AcceptThread
+
+    private val mHandler: Handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+            when (msg.what) {
+                MESSAGE_READ -> {
+                    Log.e(TAG, "read " + msg.arg1 + msg.arg2 + msg.obj)
+                    Log.e(TAG, String(msg.obj as ByteArray))
+                    ToastUtils.showShort("接收到新消息")
+                    tvRead.text = String(msg.obj as ByteArray)
+                }
+                MESSAGE_WRITE -> {
+                    Log.e(TAG, "write " + msg.arg1 + msg.arg2 + msg.obj)
+                }
+                MESSAGE_TOAST -> {
+                    Log.e(TAG, "toast " + msg.arg1 + msg.arg2 + msg.obj)
+                }
+            }
+        }
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,59 +55,30 @@ class MainActivity : AppCompatActivity() {
 
         tvUUID.text = "配对UUID：$XXH_UUID \n" +
                 "已配对设备:\n" +
-                bluetoothAdapter?.bondedDevices?.map {
-                    when (it.bondState) {
-                        BluetoothDevice.BOND_BONDED -> "已连接 "
-                        BluetoothDevice.BOND_BONDING -> "正在连接 "
-                        else -> "未连接 "
-                    } + it.name + " " +  it.address + "\n"
+                mBTAdapter.bondedDevices?.map {
+                    it.name + " " + it.address + "\n"
                 }
 
-        thread.start()
         btDisConnect.setOnClickListener {
-            thread.cancel()
+            mAcceptThread.cancel()
+        }
+
+        initListener()
+
+        btReListener.setOnClickListener {
+            initListener()
+            ToastUtils.showShort("重新监听配对")
         }
     }
 
-    private inner class AcceptThread : Thread() {
-        private val TAG = "AcceptThread"
-        private val NAME = "XXH"
+    private fun initListener() {
+        mAcceptThread = AcceptThread {
+            ToastUtils.showShort("连接成功")
+            Log.e(TAG, it.toString())
 
-        private val mmServerSocket: BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
-            bluetoothAdapter?.listenUsingInsecureRfcommWithServiceRecord(NAME, XXH_UUID)
+            mConnectedThread = ConnectedThread(mHandler, it)
+            mConnectedThread!!.start()
         }
-
-        override fun run() {
-            // Keep listening until exception occurs or a socket is returned.
-            var shouldLoop = true
-            while (shouldLoop) {
-                val socket: BluetoothSocket? = try {
-                    mmServerSocket?.accept()
-                } catch (e: IOException) {
-                    Log.e(TAG, "Socket's accept() method failed", e)
-                    shouldLoop = false
-                    null
-                }
-                socket?.also {
-                    manageMyConnectedSocket(it)
-                    mmServerSocket?.close()
-                    shouldLoop = false
-                }
-            }
-        }
-
-        // Closes the connect socket and causes the thread to finish.
-        fun cancel() {
-            try {
-                mmServerSocket?.close()
-            } catch (e: IOException) {
-                Log.e(TAG, "Could not close the connect socket", e)
-            }
-        }
-    }
-
-    private fun manageMyConnectedSocket(it: BluetoothSocket) {
-        ToastUtils.showShort("连接成功")
-        Log.e(TAG, it.toString())
+        mAcceptThread.start()
     }
 }
