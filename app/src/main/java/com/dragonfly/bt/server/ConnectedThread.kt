@@ -21,14 +21,14 @@ class ConnectedThread(private val mHandler: Handler,  private val mmSocket: Blue
     override fun run() {
         var numBytes: Int // bytes returned from read()
 
-        mHandler.obtainMessage(MESSAGE_TOAST, -1, -1, "开始监听")
+        mHandler.obtainMessage(MESSAGE_TOAST, -1, -1, "开始监听").sendToTarget()
         // Keep listening to the InputStream until an exception occurs.
         while (true) {
             // Read from the InputStream.
             numBytes = try {
                 mmInStream.read(mmBuffer)
             } catch (e: Exception) {
-                mHandler.obtainMessage(MESSAGE_TOAST, -1, -1, "停止监听: ${e.message}")
+                mHandler.obtainMessage(MESSAGE_TOAST, -1, -1, "停止监听: ${e.message}").sendToTarget()
                 Log.d(TAG, "Input stream was disconnected", e)
                 break
             }
