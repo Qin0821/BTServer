@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ToastUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.Exception
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -28,15 +29,26 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mAcceptThread: AcceptThread
 
+    @SuppressLint("HandlerLeak")
     private val mHandler: Handler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             when (msg.what) {
                 MESSAGE_READ -> {
+                    var result = "收到消息:"
+                    result = result + msg.toString()
                     Log.e(TAG, "read " + msg.arg1 + msg.arg2 + msg.obj)
                     Log.e(TAG, String(msg.obj as ByteArray))
-                    ToastUtils.showShort("接收到新消息")
-                    tvRead.text = String(msg.obj as ByteArray)
+                    runOnUiThread {
+                        try {
+                            result = result + " 准备显示消息"
+                            tvRead.text = String(msg.obj as ByteArray)
+                        } catch (e: Exception) {
+                            tvRead.text = "出错了"
+                            ToastUtils.showShort("read error: ${e.message}")
+                        }
+                        tvTip1.text = result
+                    }
                 }
                 MESSAGE_WRITE -> {
                     Log.e(TAG, "write " + msg.arg1 + msg.arg2 + msg.obj)
@@ -67,6 +79,7 @@ class MainActivity : AppCompatActivity() {
 
         btReListener.setOnClickListener {
             initListener()
+            tvTip1.text = ""
             ToastUtils.showShort("重新监听配对")
         }
     }
