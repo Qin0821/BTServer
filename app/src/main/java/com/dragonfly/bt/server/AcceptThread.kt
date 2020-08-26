@@ -1,11 +1,11 @@
-package com.dragonfly.btserver
+package com.dragonfly.bt.server
 
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.util.Log
-import com.dragonfly.btserver.MainActivity.Companion.TAG
-import com.dragonfly.btserver.MainActivity.Companion.XXH_UUID
-import com.dragonfly.btserver.MainActivity.Companion.mBTAdapter
+import com.dragonfly.bt.server.MainActivity.Companion.TAG
+import com.dragonfly.bt.server.MainActivity.Companion.XXH_UUID
+import com.dragonfly.bt.server.MainActivity.Companion.mBTAdapter
 import java.io.IOException
 
 class AcceptThread(private val connectedCallback: (BluetoothSocket) -> Unit) : Thread() {

@@ -1,4 +1,4 @@
-package com.dragonfly.btserver
+package com.dragonfly.bt.server
 
 
 import android.annotation.SuppressLint
