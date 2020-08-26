@@ -35,19 +35,11 @@ class MainActivity : AppCompatActivity() {
             super.handleMessage(msg)
             when (msg.what) {
                 MESSAGE_READ -> {
-                    var result = "收到消息:"
-                    result = result + msg.toString()
-                    Log.e(TAG, "read " + msg.arg1 + msg.arg2 + msg.obj)
-                    Log.e(TAG, String(msg.obj as ByteArray))
-                    runOnUiThread {
-                        try {
-                            result = result + " 准备显示消息"
-                            tvRead.text = String(msg.obj as ByteArray)
-                        } catch (e: Exception) {
-                            tvRead.text = "出错了"
-                            ToastUtils.showShort("read error: ${e.message}")
-                        }
-                        tvTip1.text = result
+                    try {
+                        addTip("收到消息:")
+                        addTip(String(msg.obj as ByteArray))
+                    } catch (e: Exception) {
+                        addTip("出错了:${e.message}")
                     }
                 }
                 MESSAGE_WRITE -> {
@@ -55,6 +47,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 MESSAGE_TOAST -> {
                     Log.e(TAG, "toast " + msg.arg1 + msg.arg2 + msg.obj)
+                    addTip(msg.obj.toString())
                 }
             }
         }
@@ -71,22 +64,28 @@ class MainActivity : AppCompatActivity() {
                     it.name + " " + it.address + "\n"
                 }
 
-        btDisConnect.setOnClickListener {
-            mAcceptThread.cancel()
-        }
+//        btDisConnect.setOnClickListener {
+//            mAcceptThread.cancel()
+//        }
 
         initListener()
 
         btReListener.setOnClickListener {
             initListener()
-            tvTip1.text = ""
-            ToastUtils.showShort("重新监听配对")
+            tvRead.text = ""
+            addTip("正在监听配对")
+        }
+    }
+
+    fun addTip(msg: String) {
+        runOnUiThread {
+            tvRead.text = "${tvRead.text}\n$msg"
         }
     }
 
     private fun initListener() {
         mAcceptThread = AcceptThread {
-            ToastUtils.showShort("连接成功")
+            addTip("连接成功")
             Log.e(TAG, it.toString())
 
             mConnectedThread = ConnectedThread(mHandler, it)

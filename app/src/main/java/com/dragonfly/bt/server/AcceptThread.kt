@@ -28,8 +28,8 @@ class AcceptThread(private val connectedCallback: (BluetoothSocket) -> Unit) : T
             }
             socket?.also {
                 connectedCallback.invoke(it)
-                mmServerSocket?.close()
-                shouldLoop = false
+//                mmServerSocket?.close()
+//                shouldLoop = false
             }
         }
     }
