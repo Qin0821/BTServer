@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "BTServer"
-        val XXH_UUID = UUID.fromString("33719b35-639a-4edc-b9bc-345cf8bf3829")
-        val mBTAdapter = BluetoothAdapter.getDefaultAdapter()
+        val XXH_UUID: UUID = UUID.fromString("33719b35-639a-4edc-b9bc-345cf8bf3829")
+        val mBTAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
         const val MESSAGE_READ: Int = 0
         const val MESSAGE_WRITE: Int = 1
